@@ -1,39 +1,31 @@
-import { Cormorant_Garamond, Jost } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "@/app/_styles/globals.css";
 
-const cormorant = Cormorant_Garamond({
+const display = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: "400",
   style: ["normal", "italic"],
-  variable: "--font-cormorant",
+  variable: "--font-instrument-serif",
   display: "swap",
 });
-
-const jost = Jost({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-jost",
-  display: "swap",
-});
+const sans = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 
 export const metadata = {
-  title: "OCTABOOT — The Anatomy of a Suit",
+  title: "Kodexa · The Anatomy of a Product",
   description:
-    "OCTABOOT bespoke tailoring. Eight movements of craft, from the measure of a man to the last quarter-inch of a working cuff.",
+    "Kodexa is a software studio. Scroll through the seven stages between a rough idea and software people use every day.",
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#0b0b0d",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      data-scroll-behavior="smooth"
-      className={`${cormorant.variable} ${jost.variable}`}
-    >
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body>{children}</body>
     </html>
   );

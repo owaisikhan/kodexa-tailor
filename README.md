@@ -1,15 +1,15 @@
-# kodexa-tailor
+# Kodexa · The Anatomy of a Product
 
-A Next.js 16 clone of [tailor-by-octaboot.vercel.app](https://tailor-by-octaboot.vercel.app/):
-a scroll-scrubbed image sequence of a suit being built, with editorial panels
-choreographed on one GSAP ScrollTrigger timeline.
+A scroll-driven portfolio piece: 1200 frames of an original particle scene,
+generated in code, scrubbed on a canvas as seven chapters explain how Kodexa
+takes a product from idea to launch.
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
+npm run dev                                   # http://localhost:3000
+node scripts/frames/render.mjs                # regenerate all frames
 npm run build && npm start
 npm run check -- --base http://localhost:3000
 ```
 
-See `docs/research/tailor-by-octaboot/BEHAVIORS.md` for how the scroll animation works
-and `docs/research/tailor-by-octaboot/VISUAL_QA.md` for the side-by-side comparison.
+How it works is in `CLAUDE.md`.

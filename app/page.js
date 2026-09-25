@@ -1,5 +1,5 @@
-import { SuitExperience } from "@/app/_components/home/SuitExperience";
+import { ProductExperience } from "@/app/_components/home/ProductExperience";
 
 export default function HomePage() {
-  return <SuitExperience />;
+  return <ProductExperience />;
 }

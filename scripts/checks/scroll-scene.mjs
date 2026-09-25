@@ -1,49 +1,51 @@
-// The scroll scene matches the original at fixed scroll fractions: the right
-// panel is visible, the movement counter reads right, the canvas is painted
-// (not the flat #0a0a0b fill) and the header hides on scroll down.
-// Expected values were measured on tailor-by-octaboot.vercel.app at 1440x900.
+// The story stays in sync: at the middle of every chapter's hold window the
+// right panel (and only it) is visible, the canvas is painted with frames,
+// the frame counter matches progress and the rail marks the chapter.
+// Timings come from app/_lib/chapters.js, the same file the frames use.
 
-const EXPECT = [
-  [0, "00", "hero"],
-  [0.08, "01", null],
-  [0.17, "01", "1"],
-  [0.3, "02", "2"],
-  [0.46, "03", "3"],
-  [0.6, "04", "4"],
-  [0.72, "05", "5"],
-  [0.85, "06", "6"],
-  [0.96, "07", "7"],
+import { CHAPTERS, FRAME_COUNT } from "../../app/_lib/chapters.js";
+
+const VIEWS = [
+  { name: "desktop", width: 1440, height: 900 },
+  { name: "phone", width: 390, height: 844, isMobile: true, hasTouch: true },
 ];
 
 export default async function scrollScene({ base, browser, ok }) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  const errors = [];
-  page.on("pageerror", (e) => errors.push(e.message));
-  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
-  await page.goto(base, { waitUntil: "networkidle" });
-  await page.waitForFunction(() => document.getElementById("loader").classList.contains("is-done"), null, { timeout: 90000 });
+  for (const v of VIEWS) {
+    const context = await browser.newContext({ viewport: { width: v.width, height: v.height }, isMobile: v.isMobile, hasTouch: v.hasTouch, reducedMotion: "reduce" });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    await page.goto(base, { waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("[role=status]")?.dataset.done === "true", null, { timeout: 90000 });
 
-  const sceneH = await page.evaluate(() => document.getElementById("scene").offsetHeight);
-  ok("scene is 850vh at 1440x900", sceneH === 7650, `got ${sceneH}`);
-
-  for (const [f, no, panel] of EXPECT) {
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), Math.round(f * (sceneH - 900)));
-    await page.waitForTimeout(1200);
-    const s = await page.evaluate(() => {
-      const c = document.getElementById("frames");
-      const px = c.getContext("2d").getImageData(c.width / 2, c.height / 2, 1, 1).data;
-      return {
-        no: document.getElementById("movementNo").textContent,
-        vis: [...document.querySelectorAll(".panel")].filter((p) => getComputedStyle(p).visibility === "visible").map((p) => p.dataset.panel),
-        painted: px[0] + px[1] + px[2] > 3 * 11,
-        header: document.getElementById("header").style.transform,
-      };
+    const geo = await page.evaluate(() => {
+      const s = document.getElementById("process");
+      return { top: s.offsetTop, height: s.offsetHeight, vh: innerHeight };
     });
-    const want = panel ? [panel] : [];
-    ok(`at ${f}: movement ${no}, panel ${panel ?? "none"}`, s.no === no && JSON.stringify(s.vis) === JSON.stringify(want), JSON.stringify(s));
-    if (f === 0.3) ok("canvas is painted mid-scroll", s.painted);
-    if (f === 0.3) ok("header hidden after scrolling down", s.header === "translateY(-140%)", s.header);
+
+    for (const [i, c] of CHAPTERS.entries()) {
+      const p = (c.hold[0] + Math.min(c.hold[1], 0.995)) / 2;
+      await page.evaluate((y) => window.scrollTo(0, y), Math.round(geo.top + p * (geo.height - geo.vh)));
+      await page.waitForTimeout(500);
+      const s = await page.evaluate(() => {
+        const c = document.querySelector("#process canvas");
+        const ctx = c.getContext("2d");
+        const d = ctx.getImageData(0, 0, c.width, c.height).data;
+        let lit = 0;
+        for (let k = 0; k < d.length; k += 4 * 97) if (d[k] + d[k + 1] + d[k + 2] > 120) lit++;
+        return {
+          vis: [...document.querySelectorAll("#process article")].map((a, i) => (getComputedStyle(a).visibility === "visible" && +getComputedStyle(a).opacity > 0.9 ? i : -1)).filter((i) => i >= 0),
+          lit,
+          frame: +document.querySelector("#process .tabular-nums span").textContent,
+        };
+      });
+      const expectFrame = Math.round(p * (FRAME_COUNT - 1)) + 1;
+      ok(`${v.name} ${c.id}: only panel ${i + 1} visible`, JSON.stringify(s.vis) === JSON.stringify([i]), JSON.stringify(s.vis));
+      ok(`${v.name} ${c.id}: canvas painted, frame ${expectFrame}`, s.lit > 50 && Math.abs(s.frame - expectFrame) <= 2, `lit ${s.lit}, frame ${s.frame}`);
+    }
+    ok(`${v.name}: no console errors`, errors.length === 0, errors.slice(0, 2).join("; "));
+    await context.close();
   }
-  ok("no console errors", errors.length === 0, errors.slice(0, 2).join("; "));
-  await page.close();
 }

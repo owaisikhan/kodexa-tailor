@@ -6,56 +6,61 @@ design work, and log preferences, corrections and reversals to
 
 ## What this is
 
-A 1:1 clone of https://tailor-by-octaboot.vercel.app/ ("OCTABOOT, The Anatomy
-of a Suit"): a single-page, scroll-driven site where a pinned canvas scrubs
-through 535 WebP frames (a particle figure becoming a shirt, waistcoat, jacket,
-full suit, a colour procession and a cuff macro) while seven editorial panels
-fade in and out on one GSAP timeline.
+**Kodexa · The Anatomy of a Product**: a one-page, scroll-driven portfolio
+piece for Kodexa. A pinned canvas scrubs through 1200 frames of a particle
+scene (dust, a spark, a wireframe, a design, code, a laptop and phone, a
+growth chart, a pressed button) while seven chapter panels tell the story of
+how Kodexa builds software.
 
-- **Type:** site-clone (with the 3d-website scroll rules)
-- **Goal set by the owner:** "the clone should 100 percent match the original".
-  Match first, customise later.
-- **Identity:** every name, logo, frame and line of copy is Octaboot's. Replace
-  them (or confirm the rights) before this is published as anything other than
-  Octaboot's own site.
+Everything is original: the frames are generated in code
+(`scripts/frames/`), the copy and the logo were written for Kodexa.
+
+- **Type:** 3d-website + marketing-site (portfolio, not a client product)
+- **Branch history:** `claude/laughing-darwin-wiy7si` holds the earlier 1:1
+  study of another site. This branch (`kodexa-original`) shares none of its
+  frames, copy, logo, CSS or engine code.
+- **Public face:** Hamid Javed is the only person named, as founder.
+- **Palette exceptions:** none. Ember (#e8743b) on graphite (#0b0b0d).
 
 ## Stack
 
-- Next.js 16 App Router, React 19, plain JavaScript, `@/*` alias (`jsconfig.json`)
-- GSAP 3.12.5 + ScrollTrigger (pinned to the original's version)
-- Fonts via `next/font/google`: Cormorant Garamond, Jost
-- Styles: `app/_styles/globals.css` is the original stylesheet verbatim, with
-  Tailwind theme + utilities imported but **no preflight** (it would change
-  heading metrics). Prefer editing the existing classes over adding utilities.
+- Next.js 16 App Router, React 19, plain JavaScript, `@/*` alias
+- Tailwind v4, tokens in `app/_styles/globals.css` `@theme`
+- GSAP ScrollTrigger (progress only, no pinning: the scene uses CSS sticky),
+  Lenis for smooth wheel scrolling, one `gsap.ticker` loop draws everything
+- Fonts: Instrument Serif (display), Geist (text), Geist Mono (labels)
+- Frames: three.js particle scene rendered headless by Playwright (SwiftShader)
 
-## Layout
+## How the scroll works
 
+- `app/_lib/chapters.js` is the single source of truth: `FRAME_COUNT`,
+  both sequences, hero and chapter copy, and each chapter's `hold` window.
+  The frame renderer reads the same file, so shapes and panels cannot drift.
+- `app/_lib/frame-sequence.js` loads frames in passes (every 16th, 8th, 4th,
+  2nd, then all) so the whole story is usable after about 75 frames, and draws
+  a **fractional** frame by cross-fading the two nearest loaded frames.
+- `ProductExperience.js`: ScrollTrigger reports progress, the ticker eases
+  toward it (0.14 per frame), draws, and sets panel opacity/transform.
+- Portrait viewports load `/frames/portrait` (720x1280, framed for phones with
+  the subject above the text); landscape loads `/frames/landscape` (1280x720,
+  subject opposite the panel). Save-Data or 2g/3g loads every other frame.
+- Reduced motion: no Lenis, no easing lag, panels fade without moving.
+
+## Regenerating frames
+
+```bash
+node scripts/frames/render.mjs                        # both sequences, ~10 min
+node scripts/frames/render.mjs --only 0,600 --out /tmp/preview   # preview
 ```
-app/
-  layout.js                      fonts, metadata, <html data-scroll-behavior="smooth">
-  page.js                        renders SuitExperience
-  _components/home/
-    SuitExperience.js            client: preload, canvas render, GSAP timeline, header hide
-    ScrollScene.js  Loader.js  Outro.js
-  _components/layout/SiteHeader.js
-  _lib/gsap.js                   single plugin registration point
-  _lib/scene-data.js             FRAME_COUNT, CUES, FADE, panel + footer content
-  _styles/globals.css
-public/assets/frames/frame_00001..00535.webp   1280x720, about 13 MB total
-public/assets/img/octaboot.png
-docs/research/tailor-by-octaboot/              analysis of the original
-scripts/checks/                                npm run check (Playwright)
-```
+
+Change a shape in `scripts/frames/scene.js`, timing in `chapters.js`, then
+re-render. Options: `--seq`, `--frames`, `--particles` (45000), `--q` (0.65).
 
 ## Commands
 
 - `npm run dev`, `npm run build`, `npm start`, `npm run lint`
 - `npm run check -- --base http://localhost:3000` against `npm run build && npm start`
 
-## Rules
+## Placeholders before sharing widely
 
-- Timing lives in `CUES` and `FADE` in `app/_lib/scene-data.js`. The panel
-  fade windows are tuned to frame milestones; changing frames means re-tuning cues.
-- Palette exceptions: none (the palette is the original's gold on near-black).
-- Anti-slop note: the original title and footer contain em dashes. They are
-  kept only because this is a 1:1 clone; remove them when the copy is rewritten.
+`app/_lib/siteConfig.js`: WhatsApp number and email are placeholders.

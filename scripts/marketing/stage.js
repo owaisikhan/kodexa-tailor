@@ -3,7 +3,7 @@
 // loads ?mode=post and screenshots once.
 
 const FPS = 30;
-const DESKTOP_FRAMES = 300;
+const DESKTOP_FRAMES = 240;
 const PHONE_FRAMES = 240;
 const mode = new URLSearchParams(location.search).get("mode") || "reel";
 
@@ -33,11 +33,11 @@ const LAYOUTS = {
 const SCENES = [
   [0, "intro", { eyebrow: "New website", headline: "The Anatomy<br><em>of a Suit</em>" }],
   [2, "desktop", { eyebrow: "On desktop", headline: "Scroll the making<br><em>of a suit</em>" }],
-  [12, "phone", { eyebrow: "On your phone", headline: "Every stitch,<br><em>in your pocket</em>" }],
-  [20, "end", { eyebrow: "Kodexa Tailor", headline: "Tailoring<br><em>for the few.</em>", cta: "Book a private fitting" }],
+  [10, "phone", { eyebrow: "On your phone", headline: "Every stitch,<br><em>in your pocket</em>" }],
+  [18, "end", { eyebrow: "Kodexa Tailor", headline: "Tailoring<br><em>for the few.</em>", cta: "Book a private fitting" }],
 ];
 // Cuts land on downbeats of the 120 BPM score (one bar = 2 s).
-export const DURATION = 24;
+export const DURATION = 22;
 const MOVE = 0.8;
 
 function place(el, [x, y, s, o], w, h) {

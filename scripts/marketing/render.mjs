@@ -1,6 +1,7 @@
 // Renders the Facebook reel (MP4, 1080x1920, 30 fps) and feed post
 // (1080x1350) from frames captured by capture.mjs.
-//   node scripts/marketing/render.mjs --cap /tmp/reel/cap --fonts /tmp/reel/fonts --out /tmp/reel/out
+//   python3 scripts/marketing/music.py /tmp/reel/score.wav
+//   node scripts/marketing/render.mjs --cap /tmp/reel/cap --fonts /tmp/reel/fonts --out /tmp/reel/out --audio /tmp/reel/score.wav
 // Needs ffmpeg on PATH or FFMPEG=/path/to/ffmpeg.
 
 import { createServer } from "node:http";
@@ -77,9 +78,9 @@ if (!args["post-only"]) {
   await page.close();
   if (!only) {
     const r = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-framerate", "30", "-i", join(frames, "%04d.jpg"),
-      "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000", "-shortest",
+      ...(args.audio ? ["-i", resolve(args.audio)] : ["-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000"]), "-shortest",
       "-c:v", "libx264", "-profile:v", "high", "-crf", "18", "-preset", "slow", "-pix_fmt", "yuv420p",
-      "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", join(OUT, "kodexa-tailor-reel.mp4")], { stdio: "inherit" });
+      "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", join(OUT, "kodexa-tailor-reel.mp4")], { stdio: "inherit" });
     if (r.status !== 0) throw new Error("ffmpeg failed");
     console.log("reel: done");
   }

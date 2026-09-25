@@ -4,7 +4,7 @@
 
 const FPS = 30;
 const DESKTOP_FRAMES = 240;
-const PHONE_FRAMES = 210;
+const PHONE_FRAMES = 240;
 const mode = new URLSearchParams(location.search).get("mode") || "reel";
 
 const $ = (id) => document.getElementById(id);
@@ -32,15 +32,16 @@ const LAYOUTS = {
 // Scenes: [start s, layout, caption]
 const SCENES = [
   [0, "intro", { eyebrow: "New website", headline: "The Anatomy<br><em>of a Suit</em>" }],
-  [2.2, "desktop", { eyebrow: "On desktop", headline: "Scroll the making<br><em>of a suit</em>" }],
-  [10.2, "phone", { eyebrow: "On your phone", headline: "Every stitch,<br><em>in your pocket</em>" }],
-  [17.2, "end", { eyebrow: "Kodexa Tailor", headline: "Tailoring<br><em>for the few.</em>", cta: "Book a private fitting" }],
+  [2, "desktop", { eyebrow: "On desktop", headline: "Scroll the making<br><em>of a suit</em>" }],
+  [10, "phone", { eyebrow: "On your phone", headline: "Every stitch,<br><em>in your pocket</em>" }],
+  [18, "end", { eyebrow: "Kodexa Tailor", headline: "Tailoring<br><em>for the few.</em>", cta: "Book a private fitting" }],
 ];
-export const DURATION = 20.5;
+// Cuts land on downbeats of the 120 BPM score (one bar = 2 s).
+export const DURATION = 22;
 const MOVE = 0.8;
 
 function place(el, [x, y, s, o], w, h) {
-  el.style.transform = `translate(${x - w / 2}px, ${y - h / 2}px) scale(${s})`;
+  el.style.transform = `translate(${Math.round(x - w / 2)}px, ${Math.round(y - h / 2)}px) scale(${s})`;
   el.style.opacity = o;
 }
 
@@ -53,10 +54,6 @@ function layoutAt(t) {
   const mix = (a, b) => a.map((v, i) => lerp(v, b[i], e));
   const m = mix(prev.m, cur.m);
   const p = mix(prev.p, cur.p);
-  // slow push-in while a device has the stage
-  const since = t - SCENES[k][0];
-  if (SCENES[k][1] === "desktop") m[2] *= 1 + since * 0.004;
-  if (SCENES[k][1] === "phone") p[2] *= 1 + since * 0.004;
   return { k, m, p };
 }
 

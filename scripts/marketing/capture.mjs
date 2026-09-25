@@ -18,9 +18,10 @@ const OUT = args.out || "/tmp/reel/cap";
 
 const DEVICES = [
   { name: "desktop", viewport: { width: 1440, height: 900 }, scale: 1, frames: 240 },
-  { name: "phone", viewport: { width: 390, height: 844 }, scale: 2, frames: 210, mobile: true },
+  { name: "phone", viewport: { width: 390, height: 844 }, scale: 2, frames: 240, mobile: true },
 ];
 
+const FRAME_MS = 1000 / 30;
 const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const launch = {};
 if (process.env.PLAYWRIGHT_BROWSERS_PATH === "/opt/pw-browsers") launch.executablePath = "/opt/pw-browsers/chromium";
@@ -31,9 +32,14 @@ for (const d of DEVICES) {
   await mkdir(dir, { recursive: true });
   const ctx = await browser.newContext({ viewport: d.viewport, deviceScaleFactor: d.scale, isMobile: !!d.mobile, hasTouch: !!d.mobile });
   const page = await ctx.newPage();
+  // Page time only moves when we advance it, exactly one video frame per
+  // step, so GSAP's scrubbed easing is identical from frame to frame (a
+  // real-time capture stutters because screenshots take uneven time).
+  await page.clock.install();
   await page.goto(BASE, { waitUntil: "networkidle" });
   await page.waitForFunction(() => document.getElementById("loader")?.classList.contains("is-done"), null, { timeout: 120000 });
-  await page.waitForTimeout(1500);
+  await page.clock.runFor(1500);
+  await page.waitForTimeout(1200); // the loader's CSS fade runs on real time
   const shot = (file) => page.screenshot({ path: join(OUT, file), type: "jpeg", quality: 92 });
   await shot(`${d.name}-hero.jpg`);
 
@@ -45,11 +51,12 @@ for (const d of DEVICES) {
   for (let f = 0; f < d.frames; f++) {
     const t = ease(f / (d.frames - 1));
     await page.evaluate((y) => window.scrollTo(0, y), Math.round(g.top + t * g.range * 0.995));
-    await page.waitForTimeout(45);
+    await page.clock.runFor(FRAME_MS);
     await shot(join(d.name, `${String(f).padStart(4, "0")}.jpg`));
   }
   await page.evaluate(() => window.scrollTo(0, document.getElementById("book").offsetTop - 40));
-  await page.waitForTimeout(1200);
+  await page.clock.runFor(1500);
+  await page.waitForTimeout(600);
   await shot(`${d.name}-outro.jpg`);
   console.log(`${d.name}: ${d.frames} frames`);
   await ctx.close();

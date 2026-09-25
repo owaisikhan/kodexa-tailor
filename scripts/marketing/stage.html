@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="/fonts/fonts.css" />
+<style>
+  :root { --bg:#0a0a0b; --ink:#f3efe6; --dim:#b8b2a6; --faint:#6d685f; --gold:#c6a35c; --gold-soft:#d8bd82; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--bg); }
+  #stage { position:relative; width:1080px; height:1920px; overflow:hidden; background:
+      radial-gradient(90% 45% at 50% 0%, rgba(198,163,92,.16), transparent 70%),
+      radial-gradient(70% 30% at 50% 100%, rgba(198,163,92,.08), transparent 70%), var(--bg);
+    font-family:"Jost", sans-serif; color:var(--ink); }
+  body.post #stage { height:1350px; }
+
+  .brand { position:absolute; left:0; right:0; top:96px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .brand img { width:64px; }
+  .brand span { font-size:24px; letter-spacing:.5em; padding-left:.5em; font-weight:400; }
+  body.post .brand { top:64px; flex-direction:row; justify-content:center; gap:16px; }
+  body.post .brand img { width:44px; }
+  body.post .brand span { font-size:20px; }
+
+  /* devices share one coordinate system: left/top are the device centre */
+  .device { position:absolute; left:0; top:0; will-change:transform; }
+  .monitor { width:996px; }
+  .monitor .bezel { width:996px; height:636px; padding:18px; border-radius:24px; background:#0f0f11;
+    border:1px solid rgba(255,255,255,.09); box-shadow:0 50px 90px rgba(0,0,0,.7), 0 0 0 1px #000 inset; }
+  .monitor .screen { width:960px; height:600px; border-radius:8px; overflow:hidden; background:#000; }
+  .monitor .neck { width:150px; height:96px; margin:0 auto; background:linear-gradient(90deg,#141416,#26262a 50%,#141416);
+    clip-path:polygon(18% 0,82% 0,100% 100%,0 100%); }
+  .monitor .foot { width:360px; height:16px; margin:0 auto; border-radius:8px 8px 4px 4px; background:linear-gradient(#2a2a2e,#141416); }
+
+  .phone { width:424px; height:880px; padding:16px; border-radius:66px; background:#0d0d0f;
+    border:1px solid rgba(255,255,255,.12); box-shadow:0 50px 90px rgba(0,0,0,.75), 0 0 0 3px #1b1b1e inset; }
+  .phone .screen { position:relative; width:392px; height:848px; border-radius:50px; overflow:hidden; background:#000; }
+  .phone .island { position:absolute; top:14px; left:50%; width:118px; height:34px; margin-left:-59px; border-radius:20px; background:#000; z-index:2; }
+  .phone::before, .phone::after { content:""; position:absolute; width:5px; border-radius:3px; background:#1f1f22; }
+  .phone::before { left:-5px; top:190px; height:70px; }
+  .phone::after { right:-5px; top:230px; height:110px; }
+  .screen img { display:block; width:100%; height:100%; object-fit:cover; }
+
+  .floor { position:absolute; left:140px; right:140px; height:120px; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(198,163,92,.22), transparent); filter:blur(8px); }
+
+  .caption { position:absolute; left:80px; right:80px; top:1540px; text-align:center; }
+  .eyebrow { font-size:22px; letter-spacing:.42em; padding-left:.42em; text-transform:uppercase; color:var(--gold); }
+  .headline { margin-top:22px; font-family:"Cormorant Garamond", serif; font-weight:400; font-size:92px; line-height:.98; letter-spacing:-.01em; }
+  .headline em { color:var(--gold-soft); font-style:italic; }
+  .cta { display:inline-block; margin-top:34px; padding:22px 44px; border:1.5px solid var(--gold); color:var(--gold);
+    font-size:22px; letter-spacing:.3em; padding-left:calc(44px + .3em); text-transform:uppercase; }
+  .foot-note { margin-top:26px; font-size:20px; letter-spacing:.24em; text-transform:uppercase; color:var(--faint); }
+
+  .caption.has-cta { top:1400px; }
+  body.post .caption.post-top { top:150px; }
+  body.post .caption.post-bottom { top:1110px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="brand"><img src="/logo.svg" alt="" /><span>KODEXA TAILOR</span></div>
+
+  <div class="floor" id="floor"></div>
+
+  <div class="device monitor" id="monitor">
+    <div class="bezel"><div class="screen"><img id="mImg" alt="" /></div></div>
+    <div class="neck"></div><div class="foot"></div>
+  </div>
+
+  <div class="device phone" id="phone">
+    <div class="screen"><div class="island"></div><img id="pImg" alt="" /></div>
+  </div>
+
+  <div id="captions"></div>
+</div>
+<script type="module" src="/stage.js"></script>
+</body>
+</html>

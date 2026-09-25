@@ -17,8 +17,11 @@ const BASE = args.base || "http://localhost:3000";
 const OUT = args.out || "/tmp/reel/cap";
 
 const DEVICES = [
-  { name: "desktop", viewport: { width: 1440, height: 900 }, scale: 1, frames: 240 },
-  { name: "phone", viewport: { width: 390, height: 844 }, scale: 2, frames: 240, mobile: true },
+  // The story is split across the two devices so each scrolls slowly
+  // (about one site frame per video frame): desktop plays chapters 1 to 4,
+  // the phone picks up at chapter 5.
+  { name: "desktop", viewport: { width: 1440, height: 900 }, scale: 1, frames: 300, from: 0, to: 0.645 },
+  { name: "phone", viewport: { width: 390, height: 844 }, scale: 2, frames: 240, from: 0.675, to: 0.995, mobile: true },
 ];
 
 const FRAME_MS = 1000 / 30;
@@ -47,10 +50,13 @@ for (const d of DEVICES) {
     const s = document.getElementById("scene");
     return { top: s.offsetTop, range: s.offsetHeight - innerHeight };
   });
-  // a gentle lead-in so the first frames show the hero title
+  if (d.from > 0) {
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round(g.top + d.from * g.range));
+    await page.clock.runFor(3000);
+  }
   for (let f = 0; f < d.frames; f++) {
     const t = ease(f / (d.frames - 1));
-    await page.evaluate((y) => window.scrollTo(0, y), Math.round(g.top + t * g.range * 0.995));
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round(g.top + (d.from + t * (d.to - d.from)) * g.range));
     await page.clock.runFor(FRAME_MS);
     await shot(join(d.name, `${String(f).padStart(4, "0")}.jpg`));
   }

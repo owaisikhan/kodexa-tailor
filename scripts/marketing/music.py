@@ -2,11 +2,11 @@
 
     python3 scripts/marketing/music.py /tmp/reel/out/score.wav
 
-120 BPM, D minor, 11 bars of 2 s = 22 s, cut to the reel's scenes:
-  bar 0      intro      pad swells in, riser into the first cut
-  bars 1-4   desktop    impact, sub bass, 8th-note pluck arpeggio, soft kick, stitch ticks
-  bars 5-8   phone      impact, 16th-note arpeggio, four-on-the-floor kick, hats, brighter pad
-  bars 9-10  end card   impact, held D minor chord with a bell line, fade out
+120 BPM, D minor, 12 bars of 2 s = 24 s, cut to the reel's scenes:
+  bar 0       intro      A major (the dominant) swells in, riser into the first cut
+  bars 1-5    desktop    impact, sub bass, 8th-note pluck arpeggio, soft kick, stitch ticks
+  bars 6-9    phone      impact, 16th-note arpeggio, four-on-the-floor kick, hats, brighter pad
+  bars 10-11  end card   impact, held D minor chord with a bell line, fade out
 Needs numpy only.
 """
 
@@ -19,7 +19,10 @@ SR = 48000
 BPM = 120
 BEAT = 60 / BPM
 BAR = 4 * BEAT
-BARS = 11
+BARS = 12
+DESK = range(1, 6)
+PHONE = range(6, 10)
+END = (10, 11)
 LENGTH = BARS * BAR
 N = int(LENGTH * SR)
 rng = np.random.default_rng(7)
@@ -74,10 +77,10 @@ CHORDS = {
     "Bb": ([50, 53, 58, 62], 34),
     "F": ([48, 53, 57, 60], 41),
     "C": ([48, 52, 55, 60], 36),
+    "A": ([49, 52, 57, 61], 33),
 }
 PROG = ["Dm", "Bb", "F", "C"]
-bar_chord = [PROG[b % 4] for b in range(BARS)]
-bar_chord[9] = bar_chord[10] = "Dm"
+bar_chord = ["A"] + ["Dm", "Bb", "F", "C", "Bb"] + PROG + ["Dm", "Dm"]
 
 # ---------- instruments ---------------------------------------------------
 
@@ -172,8 +175,8 @@ send = np.zeros((2, N))  # reverb send
 for b in range(BARS):
     notes, root = CHORDS[bar_chord[b]]
     start = b * BAR
-    phone = 5 <= b <= 8
-    end = b >= 9
+    phone = b in PHONE
+    end = b in END
     voicing = [m + 12 for m in notes] if phone else notes
     p = pad(voicing, BAR + 1.0, 1.6 if phone else 1.0)
     gain = 0.5
@@ -181,10 +184,10 @@ for b in range(BARS):
     add(dry, p, start + 0.011, gain * 0.55, 0.25)
     add(send, p, start, gain * 0.5)
 
-    if 1 <= b <= 8:
+    if b in DESK or phone:
         add(dry, sub(root, BAR), start, 0.55)
 
-    if 1 <= b <= 8:
+    if b in DESK or phone:
         steps = 16 if phone else 8
         arp = [voicing[i] + 12 for i in (0, 1, 2, 3, 2, 1, 2, 3)]
         for s in range(steps):
@@ -195,7 +198,7 @@ for b in range(BARS):
             add(dry, pluck(m, 0.6), when, 0.22 * accent, pan)
             add(send, pluck(m, 0.6), when, 0.18 * accent)
 
-    if 1 <= b <= 4:
+    if b in DESK:
         for beat in (0, 2):
             add(dry, kick(0.8), start + beat * BEAT, 0.7)
         for s in range(8):
@@ -212,7 +215,7 @@ for b in range(BARS):
 
     if end:
         # bell line over the final chord: D5 A4 F5 E5 D5
-        if b == 9:
+        if b == END[0]:
             for m, beat in ((74, 0), (69, 1), (77, 2), (76, 3)):
                 add(dry, bell(m), start + beat * BEAT, 0.16, 0.2)
                 add(send, bell(m), start + beat * BEAT, 0.22)
@@ -225,10 +228,10 @@ for b in range(BARS):
 add(dry, bell(62, 2.4), 0.05, 0.2, -0.15)
 add(send, bell(62, 2.4), 0.05, 0.3)
 add(dry, impact(), 0.0, 0.35)
-for bar in (1, 5, 9):
+for bar in (1, 6, 10):
     add(dry, impact(), bar * BAR, 0.75)
     add(send, impact(), bar * BAR, 0.35)
-for bar, dur in ((1, 1.6), (5, 1.8), (9, 1.8)):
+for bar, dur in ((1, 1.6), (6, 1.8), (10, 1.8)):
     r = riser(dur)
     add(dry, r, bar * BAR - dur, 0.28)
     add(send, r, bar * BAR - dur, 0.25)

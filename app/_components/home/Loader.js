@@ -5,7 +5,7 @@ export function Loader({ loaderRef, fillRef, pctRef }) {
     <div className="loader" id="loader" aria-hidden="true" ref={loaderRef}>
       <div className="loader__mark">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/img/octaboot.png" alt="" />
+        <img src="/assets/img/kodexa.svg" alt="" />
       </div>
       <div className="loader__bar">
         <span id="loaderFill" ref={fillRef} />

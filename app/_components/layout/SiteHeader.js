@@ -3,10 +3,10 @@
 export function SiteHeader({ headerRef }) {
   return (
     <header className="site-header" id="header" ref={headerRef}>
-      <a className="brand" href="#top" aria-label="Octaboot home">
+      <a className="brand" href="#top" aria-label="Kodexa home">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="brand__mark" src="/assets/img/octaboot.png" alt="" />
-        <span className="brand__word">OCTABOOT</span>
+        <img className="brand__mark" src="/assets/img/kodexa.svg" alt="" />
+        <span className="brand__word">KODEXA</span>
       </a>
       <nav className="nav">
         <a href="#atelier">Atelier</a>

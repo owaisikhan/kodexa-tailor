@@ -5,7 +5,7 @@ import { PANELS } from "@/app/_lib/scene-data";
 // Section is 850vh tall (760vh under 900px); #sticky is pinned by GSAP.
 export function ScrollScene({ canvasRef, progressRef, movementRef }) {
   return (
-    <section className="scene" id="scene" aria-label="The making of an Octaboot suit">
+    <section className="scene" id="scene" aria-label="The making of a Kodexa suit">
       <div className="sticky" id="sticky">
         <canvas id="frames" className="frames-canvas" ref={canvasRef} />
 
@@ -15,7 +15,7 @@ export function ScrollScene({ canvasRef, progressRef, movementRef }) {
         <div className="grain" />
 
         <div className="panel panel--hero" data-panel="hero">
-          <p className="eyebrow">Octaboot · Bespoke Since MCMXC8</p>
+          <p className="eyebrow">Kodexa · Bespoke Since MCMXC8</p>
           <h1 className="hero-title">
             The Anatomy
             <br />

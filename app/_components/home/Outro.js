@@ -5,7 +5,7 @@ export function Outro({ yearRef }) {
     <section className="outro" id="book">
       <div className="outro__mark">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/img/octaboot.png" alt="Octaboot" />
+        <img src="/assets/img/kodexa.svg" alt="Kodexa" />
       </div>
       <p className="eyebrow eyebrow--center">The House of Fashion</p>
       <h2 className="outro__title">
@@ -14,7 +14,7 @@ export function Outro({ yearRef }) {
         for the few.
       </h2>
       <p className="outro__body">
-        Every Octaboot suit is cut to one man and one man only. Begin with a conversation, a
+        Every Kodexa suit is cut to one man and one man only. Begin with a conversation, a
         measure, and a single bolt of cloth chosen for you alone.
       </p>
       <a className="btn" href="#book">
@@ -24,8 +24,8 @@ export function Outro({ yearRef }) {
       <footer className="site-footer">
         <div className="foot-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/img/octaboot.png" alt="" />
-          <span>OCTABOOT</span>
+          <img src="/assets/img/kodexa.svg" alt="" />
+          <span>KODEXA</span>
         </div>
         <div className="foot-cols">
           {FOOTER_COLUMNS.map((col) => (
@@ -40,7 +40,7 @@ export function Outro({ yearRef }) {
           ))}
         </div>
         <p className="foot-legal">
-          © <span id="year" ref={yearRef} /> Octaboot Bespoke — Made by hand, for a lifetime.
+          © <span id="year" ref={yearRef} /> Kodexa Tailor — Made by hand, for a lifetime.
         </p>
       </footer>
     </section>

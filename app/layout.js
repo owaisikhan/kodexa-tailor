@@ -17,7 +17,7 @@ const jost = Jost({
 });
 
 export const metadata = {
-  title: "KODEXA TAILOR — The Anatomy of a Suit",
+  title: "KODEXA TAILOR · The Anatomy of a Suit",
   description:
     "Kodexa Tailor bespoke tailoring. Eight movements of craft, from the measure of a man to the last quarter-inch of a working cuff.",
 };

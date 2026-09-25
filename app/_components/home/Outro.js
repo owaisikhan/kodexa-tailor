@@ -40,7 +40,7 @@ export function Outro({ yearRef }) {
           ))}
         </div>
         <p className="foot-legal">
-          © <span id="year" ref={yearRef} /> Kodexa Tailor — Made by hand, for a lifetime.
+          © <span id="year" ref={yearRef} /> Kodexa Tailor · Made by hand, for a lifetime.
         </p>
       </footer>
     </section>

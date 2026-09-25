@@ -13,3 +13,4 @@
 - Octopus logo replaced with the Kodexa mark (`public/assets/img/kodexa.svg`)
   in the header, loader, outro and footer. Page title reads "KODEXA TAILOR".
 - Owner confirmed they own the original site, so frames and copy stay.
+- Em dashes in the page title and footer line replaced with "·".

@@ -57,5 +57,4 @@ scripts/checks/                                npm run check (Playwright)
 - Timing lives in `CUES` and `FADE` in `app/_lib/scene-data.js`. The panel
   fade windows are tuned to frame milestones; changing frames means re-tuning cues.
 - Palette exceptions: none (the palette is the original's gold on near-black).
-- Anti-slop note: the original title and footer contain em dashes. They are
-  kept only because this is a 1:1 clone; remove them when the copy is rewritten.
+- No em or en dashes anywhere (swapped for "·" on 2026-09-25).
